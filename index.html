@@ -13,10 +13,12 @@
   <script id="template" type="text/ractive">
 
     <ul class="nav nav-tabs">
-      <li role="presentation"><a href="#">Score</a></li>
-      <li role="presentation" class="active"><a href="#">Setup</a></li>
+      <li role="presentation" class="{{ (view === 'score') ? 'active' : '' }}"><a href="#" on-click="set('view', 'score')">Score</a></li>
+      <li role="presentation" class="{{ (view === 'setup') ? 'active' : '' }}"><a href="#" on-click="set('view', 'setup')">Setup</a></li>
     </ul>
 
+
+    {{ #(view === 'score') }}
     <h1>Score sheet</h1>
 
     <table>
@@ -43,7 +45,10 @@
       </tbody>
     </table>
     <button on-click="addRound">Add Round</button>
+    {{ / }}
 
+
+    {{ #(view === 'setup') }}
     <h1>Setup</h1>
 
     <h2>Player names</h2>
@@ -74,6 +79,7 @@
       <li>{{ this }}</li>
       {{ /each }}
     </ul>
+    {{ / }}
 
   </script>
 
@@ -111,7 +117,7 @@
       template: '#template',
 
       data: {
-        rounds: [0,1],
+        view: 'setup',
 
         players: retrievePlayers(),
 
