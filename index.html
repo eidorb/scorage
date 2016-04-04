@@ -1,15 +1,21 @@
 <!doctype html>
-<html lang='en'>
+<html lang="en">
 <head>
-  <meta charset='utf-8'>
+  <meta charset="utf-8">
   <title>Scorage</title>
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 </head>
 
 <body>
 
-  <div id='container'></div>
+  <div id="ractive-container" class="container"></div>
 
-  <script id='template' type='text/ractive'>
+  <script id="template" type="text/ractive">
+
+    <ul class="nav nav-tabs">
+      <li role="presentation"><a href="#">Score</a></li>
+      <li role="presentation" class="active"><a href="#">Setup</a></li>
+    </ul>
 
     <h1>Score sheet</h1>
 
@@ -71,8 +77,8 @@
 
   </script>
 
-  <script src='//cdnjs.cloudflare.com/ajax/libs/ractive/0.7.3/ractive.min.js'></script>
-  <script src='//cdnjs.cloudflare.com/ajax/libs/store.js/1.3.20/store.min.js'></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/ractive/0.7.3/ractive.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/store.js/1.3.20/store.min.js"></script>
 
   <script>
     function retrievePlayers() {
@@ -100,7 +106,7 @@
     }
 
     var ractive = new Ractive({
-      el: '#container',
+      el: '#ractive-container',
 
       template: '#template',
 
