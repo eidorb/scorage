@@ -4,6 +4,17 @@
   <meta charset="utf-8">
   <title>Scorage</title>
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+  <style type="text/css">
+    .number-input {
+      width: 4rem;
+    }
+    .vertical-middle {
+      vertical-align: middle !important;
+    }
+    .text-center
+      text-align: center;
+    }
+  </style>
 </head>
 
 <body>
@@ -21,30 +32,44 @@
     {{ #(view === 'score') }}
     <h1>Score sheet</h1>
 
-    <table>
+    <table class="table">
       <thead>
-        <th>Round</th>
-        {{ #each shortenedNames }}
-        <th colspan="3">{{ this }}</th>
+        <th colspan="2">Round</th>
+        {{ #each playerNames }}
+        <th>{{ this }}</th>
         {{ /each }}
       </thead>
       <tbody>
         {{ #each rounds }}
         <tr>
-          <td>{{ round + 1 }}</td>
-          {{ #each data: index }}
-          <td><input type="number" value="{{ isNaN(bid) ? '' : bid }}" on-change="editBid: {{ round }}, {{ index }}" twoway="false"/></td>
-          <td><input type="number" value="{{ isNaN(trick) ? '' : trick }}" on-change="editTrick: {{ round }}, {{ index }}" twoway="false"/></td>
-          <td>{{ isNaN(score) ? '' : score }}</td>
+          <th rowspan="3" class="vertical-middle">{{ round + 1 }}</th>
+          <td>Bid</td>
+          {{ #each bids: index }}
+          <td><input type="number" value="{{ isNaN(this) ? '' : this }}" on-change="editBid: {{ round }}, {{ index }}" twoway="false" class="number-input"></td>
           {{ /each }}
           {{ #if(numRounds > 1) }}
-          <td><button on-click="removeRound: {{ round }}">Remove</button></td>
+          <td rowspan="3" class="vertical-middle text-center"><button type="button" class="btn btn-danger" on-click="removeRound: {{ round }}"><span class="glyphicon glyphicon-remove"></span>
+</button></td>
           {{ /if }}
+        </tr>
+        <tr>
+          <td>Tricks</td>
+          {{ #each tricks: index }}
+          <td><input type="number" value="{{ isNaN(this) ? '' : this }}" on-change="editTrick: {{ round }}, {{ index }}" twoway="false" class="number-input"></td>
+          {{ /each }}
+        </tr>
+        <tr>
+          <td>Score</td>
+          {{ #each scores: index }}
+          <td>{{ isNaN(this) ? '' : this }}</td>
+          {{ /each }}
         </tr>
         {{ /each }}
       </tbody>
     </table>
-    <button on-click="addRound">Add Round</button>
+    <div class="form-group">
+      <button type="button" class="btn btn-success" on-click="addRound"><span class="glyphicon glyphicon-plus"></span></button>
+    </div>
     {{ / }}
 
 
@@ -53,26 +78,28 @@
 
     <h2>Player names</h2>
 
-    <ul>
       {{ #each players: index }}
-      <li>
-        <input placeholder="Player name" value="{{ name }}"/>
+      <div class="form-group">
+        <input placeholder="Player name" value="{{ name }}">
         {{ #if players.length > 1 }}
-        <button on-click="removePlayer: {{ index }}">Remove</button>
+        <button type="button" class="btn btn-danger btn-xs" on-click="removePlayer: {{ index }}"><span class="glyphicon glyphicon-remove"></span></button>
         {{ /if }}
-      </li>
+      </div>
       {{ /each}}
-      <li><input placeholder="New player name" on-change="addPlayer"></li>
-    </ul>
+      <div class="form-group">
+        <input placeholder="New player name" on-change="addPlayer">
+      </div>
 
 
     <h2>Rules</h2>
 
-    <select value="{{ rules }}">
-      {{ #each ruleSets: id }}
-      <option value="{{ id }}">{{ name }}</option>
-      {{ /each }}
-    </select>
+    <div class="form-group">
+      <select value="{{ rules }}">
+        {{ #each ruleSets: id }}
+        <option value="{{ id }}">{{ name }}</option>
+        {{ /each }}
+      </select>
+    </div>
 
     <ul>
       {{ #each ruleSets[rules].details }}
@@ -201,24 +228,24 @@
         rounds: function() {
           var players = this.get('players');
           var score = this.get('ruleSets')[this.get('rules')].score;
-          // Create an array of data for each round.
+          // Create an array of objects containing data for each round.
           var rounds = [];
           for (var round = 0; round < this.get('numRounds'); round++) {
-            // Create an array of objects with bid, trick and score values for
-            // each player.
-            var data = [];
+            // For each round, create arrays of bids, tricks and scores of each player.
+            var bids = [];
+            var tricks = [];
+            var scores = [];
             for (var index = 0; index < players.length; index++) {
-              var bid = players[index].bids[round];
-              var trick = players[index].tricks[round];
-              data.push({
-                bid: bid,
-                trick: trick,
-                score: score(bid, trick)
-              });
+              bids.push(players[index].bids[round]);
+              tricks.push(players[index].tricks[round]);
+              scores.push(score(
+                players[index].bids[round], players[index].tricks[round]));
             }
             rounds.push({
               round: round,
-              data: data
+              bids: bids,
+              tricks: tricks,
+              scores: scores,
             });
           }
           return rounds;
