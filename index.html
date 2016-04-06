@@ -114,12 +114,15 @@
   <script src="//cdnjs.cloudflare.com/ajax/libs/store.js/1.3.20/store.min.js"></script>
 
   <script>
+    // Return a list of player objects. Player names are retrieved from storage
+    // or a default player name is used.
     function retrievePlayers() {
       var names = store.get('names');
       if (!names) {
         console.log('No names in storage, using default player name.');
         names = ['Player 1'];
       }
+      // Bids and tricks arrays are set to contain a single NaN.
       return names.map(function(name) {
         return {
           name: name,
@@ -159,6 +162,10 @@
               '+5 points for taking zero tricks (for bids of zero)',
             ],
             score: function(bids, tricks) {
+              // Return NaN if either bids or tricks is NaN.
+              if (isNaN(bids) || isNaN(tricks)) {
+                return NaN;
+              }
               if (bids === tricks) {
                 if (bids > 0) {
                   return tricks + 10;
@@ -178,6 +185,10 @@
               '-5 points for missing your bid',
             ],
             score: function(bids, tricks) {
+              // Return NaN if either bids or tricks is NaN.
+              if (isNaN(bids) || isNaN(tricks)) {
+                return NaN;
+              }
               if (bids === tricks) {
                 return tricks + 10;
               } else {
@@ -194,6 +205,10 @@
               '-5 points for missing your bid',
             ],
             score: function(bids, tricks) {
+              // Return NaN if either bids or tricks is NaN.
+              if (isNaN(bids) || isNaN(tricks)) {
+                return NaN;
+              }
               if (bids === tricks) {
                 if (bids > 0) {
                   return tricks + 10;
