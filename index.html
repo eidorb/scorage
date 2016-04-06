@@ -169,7 +169,7 @@
               '+10 points for taking the exact number of tricks bid (for non-zero bids)',
               '+5 points for taking zero tricks (for bids of zero)',
             ],
-            score: function(bids, tricks) {
+            scoreFunc: function(round, bids, tricks) {
               // Return NaN if either bids or tricks is NaN.
               if (isNaN(bids) || isNaN(tricks)) {
                 return NaN;
@@ -192,7 +192,7 @@
               '+10 points for taking the exact number of tricks bid (including bids of zero)',
               '-5 points for missing your bid',
             ],
-            score: function(bids, tricks) {
+            scoreFunc: function(round, bids, tricks) {
               // Return NaN if either bids or tricks is NaN.
               if (isNaN(bids) || isNaN(tricks)) {
                 return NaN;
@@ -212,7 +212,7 @@
               '+5 points for taking zero tricks (for bids of zero)',
               '-5 points for missing your bid',
             ],
-            score: function(bids, tricks) {
+            scoreFunc: function(round, bids, tricks) {
               // Return NaN if either bids or tricks is NaN.
               if (isNaN(bids) || isNaN(tricks)) {
                 return NaN;
