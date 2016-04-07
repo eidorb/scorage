@@ -39,27 +39,36 @@
         <th>{{ this }}</th>
         {{ /each }}
       </thead>
+
+      {{ #createTable() }}
       <tbody>
-        {{ #each scoreTable.rounds: round }}
+        {{ #each rounds: round }}
         <tr>
           <th rowspan="3" class="vertical-middle">{{ round + 1 }}</th>
+
           <td>Bid</td>
+
           {{ #each bids: index }}
           <td><input type="number" value="{{ isNaN(this) ? '' : this }}" on-change="editBid: {{ round }}, {{ index }}" twoway="false" class="number-input"></td>
           {{ /each }}
+
           {{ #if(numRounds > 1) }}
           <td rowspan="3" class="vertical-middle text-center"><button type="button" class="btn btn-danger" on-click="removeRound: {{ round }}"><span class="glyphicon glyphicon-remove"></span>
 </button></td>
           {{ /if }}
         </tr>
+
         <tr>
           <td>Tricks</td>
+
           {{ #each tricks: index }}
           <td><input type="number" value="{{ isNaN(this) ? '' : this }}" on-change="editTrick: {{ round }}, {{ index }}" twoway="false" class="number-input"></td>
           {{ /each }}
         </tr>
+
         <tr>
           <td>Score</td>
+
           {{ #each scores: index }}
           <td>{{ isNaN(this) ? '' : this }}</td>
           {{ /each }}
@@ -68,17 +77,19 @@
 
         <tr>
           <th colspan="2">Total</th>
-          {{ #each scoreTable.totals }}
+
+          {{ #each totals }}
           <td>{{ this }}</td>
           {{ /each }}
         </tr>
-
       </tbody>
+      {{ /createTable }}
+
     </table>
     <div class="form-group">
       <button type="button" class="btn btn-success" on-click="addRound"><span class="glyphicon glyphicon-plus"></span></button>
     </div>
-    {{ / }}
+    {{ /(view === 'score') }}
 
 
     {{ #(view === 'setup') }}
@@ -114,7 +125,7 @@
       <li>{{ this }}</li>
       {{ /each }}
     </ul>
-    {{ / }}
+    {{ /(view === 'setup') }}
 
   </script>
 
@@ -169,13 +180,13 @@
               '+10 points for taking the exact number of tricks bid (for non-zero bids)',
               '+5 points for taking zero tricks (for bids of zero)',
             ],
-            scoreFunc: function(round, bids, tricks) {
-              // Return NaN if either bids or tricks is NaN.
-              if (isNaN(bids) || isNaN(tricks)) {
+            scoreFunc: function(round, bid, tricks) {
+              // Return NaN if either bid or tricks is NaN.
+              if (isNaN(bid) || isNaN(tricks)) {
                 return NaN;
               }
-              if (bids === tricks) {
-                if (bids > 0) {
+              if (bid === tricks) {
+                if (bid > 0) {
                   return tricks + 10;
                 } else {
                   return tricks + 5;
@@ -192,12 +203,12 @@
               '+10 points for taking the exact number of tricks bid (including bids of zero)',
               '-5 points for missing your bid',
             ],
-            scoreFunc: function(round, bids, tricks) {
-              // Return NaN if either bids or tricks is NaN.
-              if (isNaN(bids) || isNaN(tricks)) {
+            scoreFunc: function(round, bid, tricks) {
+              // Return NaN if either bid or tricks is NaN.
+              if (isNaN(bid) || isNaN(tricks)) {
                 return NaN;
               }
-              if (bids === tricks) {
+              if (bid === tricks) {
                 return tricks + 10;
               } else {
                 return tricks - 5;
@@ -212,13 +223,13 @@
               '+5 points for taking zero tricks (for bids of zero)',
               '-5 points for missing your bid',
             ],
-            scoreFunc: function(round, bids, tricks) {
-              // Return NaN if either bids or tricks is NaN.
-              if (isNaN(bids) || isNaN(tricks)) {
+            scoreFunc: function(round, bid, tricks) {
+              // Return NaN if either bid or tricks is NaN.
+              if (isNaN(bid) || isNaN(tricks)) {
                 return NaN;
               }
-              if (bids === tricks) {
-                if (bids > 0) {
+              if (bid === tricks) {
+                if (bid > 0) {
                   return tricks + 10;
                 } else {
                   return tricks + 5;
@@ -228,6 +239,44 @@
               }
             }
           }
+        },
+
+        // Compute data for the table.
+        createTable: function() {
+          var players = this.get('players');
+          var numRounds = this.get('numRounds');
+          var calcScore = this.get('ruleSets')[this.get('rules')].scoreFunc;
+          var table = {};
+          table.rounds = [];
+          table.totals = [];
+          // The total score for each player is initially set to zero.
+          table.totals = players.map(function() {return 0});
+          // Create player-wise bids, tricks and scores for each round.
+          for (var round = 0; round < numRounds; round++) {
+            var bids = [];
+            var tricks = [];
+            var scores = [];
+            // Retrieve each player's bid and tricks for the round, compute
+            // each player's score.
+            for (var index = 0; index < players.length; index++) {
+              var bid = players[index].bids[round];
+              var trick = players[index].tricks[round];
+              var score = calcScore(round, bid, trick);
+              bids.push(bid);
+              tricks.push(trick);
+              scores.push(score);
+              // Add score to the player's total.
+              if (!isNaN(score)) {
+                table.totals[index] += score;
+              }
+            }
+            table.rounds.push({
+              bids: bids,
+              tricks: tricks,
+              scores: scores,
+            });
+          }
+          return table;
         }
       },
 
@@ -245,45 +294,6 @@
         // Number of rounds, calculated from the first player's bids.
         numRounds: function() {
           return this.get('players')[0].bids.length;
-        },
-
-        // Compute data for the table.
-        scoreTable: function() {
-          var players = this.get('players');
-          var numRounds = this.get('numRounds');
-          var score = this.get('ruleSets')[this.get('rules')].score;
-          var table = {};
-          table.rounds = [];
-          // Create data for each round (per player).
-          for (var round = 0; round < numRounds; round++) {
-            // For each round, create arrays containing the bids, tricks and
-            // scores of each player.
-            var bids = [];
-            var tricks = [];
-            var scores = [];
-            for (var index = 0; index < players.length; index++) {
-              bids.push(players[index].bids[round]);
-              tricks.push(players[index].tricks[round]);
-              scores.push(score(
-                players[index].bids[round], players[index].tricks[round]));
-            }
-            table.rounds.push({
-              bids: bids,
-              tricks: tricks,
-              scores: scores,
-            });
-          }
-
-          // Sum each player's scores.
-          table.totals = players.map(function() {return 0});
-          table.rounds.forEach(function(round) {
-            round.scores.forEach(function(value, index) {
-              if (!isNaN(value)) {
-                table.totals[index] += value;
-              }
-            });
-          });
-          return table;
         }
       }
     });
@@ -292,10 +302,12 @@
       addPlayer: function(event) {
         // The new player's bids and tricks arrays are filled with as many NaNs
         // as there are rounds.
-        var bids = this.get('rounds').map(function() {
-          return NaN;
-        });
-        // Copy of bids.
+        var numRounds = this.get('numRounds');
+        var bids = [];
+        for (var i = 0; i < numRounds; i++) {
+          bids.push(NaN);
+        }
+        // Tricks is a copy of bids.
         var tricks = bids.slice();
         this.push('players', {
           name: event.node.value.trim(),
