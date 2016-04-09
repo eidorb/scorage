@@ -52,7 +52,7 @@
     }
 
     input[type=text] {
-      width: 20rem;
+      width: 10rem;
     }
 
     /* Remove Webkit spinners. */
@@ -167,7 +167,7 @@
 
       {{ #(view === 'setup') }}
       <div class="row">
-        <div class="col">
+        <div class="col s12 m6">
           <h4>Player names</h4>
 
           {{ #each players: index }}
@@ -184,8 +184,9 @@
             <input id="new-player-name" type="text" on-change="addPlayer">
             <label for="new-player-name">New player name</label>
           </div>
+        </div>
 
-
+        <div class="col s12 m6">
           <h4>Rules</h4>
 
           <div class="input-field">
