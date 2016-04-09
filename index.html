@@ -450,18 +450,21 @@
       }
     });
 
-    // Observe player names and rules for changes. On changes, write to storage.
-    ractive.observe({
-      playerNames: function() {
-        store.set('names', this.get('playerNames'));
-      },
+    // If storage is enabled, observe settings for change and write to storage.
+    if (store.enabled) {
+      ractive.observe({
+        playerNames: function() {
+          store.set('names', this.get('playerNames'));
+        },
 
-      rules: function() {
-        store.set('rules', this.get('rules'));
-      }
-    }, {
-      init: false
-    });
+        rules: function() {
+          store.set('rules', this.get('rules'));
+        }
+      }, {
+        // Don't call the functions initially.
+        init: false
+      });
+    }
 
     // Return the shortest unique prefixes from an array of strings.
     function uniquePrefixes(strings) {
