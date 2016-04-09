@@ -319,7 +319,15 @@
                 if (bid > 0) {
                   return tricks + 10;
                 } else {
-                  return tricks + 5;
+                  // Successful zero bids get points equal to the maximum of 5
+                  // or the current round number.
+                  var points;
+                  if ((round + 1) > 5) {
+                    points = round + 1;
+                  } else {
+                    points = 5;
+                  }
+                  return points;
                 }
               } else {
                 return tricks - 5;
