@@ -5,118 +5,206 @@
   <title>Scorage</title>
   <link href="//fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link type="text/css" rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css"  media="screen,projection"/>
+  <style type="text/css">
+    /* Adjust z-index so that nav shadows are shown on tabs. */
+    nav {
+      position: relative;
+      z-index: 1;
+    }
+
+    .row {
+      overflow: auto;
+    }
+
+    table {
+      width: initial;
+    }
+
+    /* Bottom border after each round. */
+    table > tbody > tr:nth-child(3n+0) {
+      border-bottom: 1px solid #d0d0d0;
+    }
+
+    /* Center row headers too. */
+    table.centered tbody tr th {
+      text-align: center;
+    }
+
+    table tbody th[rowspan] {
+      padding-right: 1em;
+    }
+
+    table input[type=number] {
+      text-align: center;
+      width: 2rem;
+      height: 1.5rem;
+      margin: 0;
+    }
+
+    table th .chip {
+      text-transform: uppercase;
+      font-weight: inherit;
+    }
+
+    td, th {
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+
+    input[type=text] {
+      width: 20rem;
+    }
+
+    /* Remove Webkit spinners. */
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    select.browser-default {
+      width: inherit;
+    }
+
+    /* Space buttons a bit. */
+    .input-field button:not(:first-child) {
+      margin-left: 1rem;
+    }
+  </style>
 </head>
 
 <body>
 
-  <div id="ractive-container" class="container"></div>
+  <nav>
+    <div class="nav-wrapper container">
+      <a class="brand-logo center" href="javascript:;">Scorage</a>
+    </div>
+  </nav>
+
+  <div id="ractive-container"></div>
 
   <script id="template" type="text/ractive">
 
-    <ul class="nav nav-tabs">
-      <li role="presentation" class="{{ (view === 'score') ? 'active' : '' }}"><a href="javascript:;" on-click="set('view', 'score')">Score</a></li>
-      <li role="presentation" class="{{ (view === 'setup') ? 'active' : '' }}"><a href="javascript:;" on-click="set('view', 'setup')">Setup</a></li>
+    <ul class="tabs">
+      <li class="tab"><a href="javascript:;" class="{{ (view === 'score') ? 'active' : '' }}" on-click="set('view', 'score')">Scores</a></li>
+      <li class="tab"><a href="javascript:;" class="{{ (view === 'setup') ? 'active' : '' }}" on-click="set('view', 'setup')">Setup</a></li>
     </ul>
 
+    <div class="container">
+      {{ #(view === 'score') }}
+      <div class="row">
+        <div class="col">
+          <table class="centered">
+            <thead>
+              <tr>
+                <th colspan="2">Round</th>
+                {{ #each shortenedNames }}
+                <th><div class="chip">{{ this }}</div></th>
+                {{ /each }}
+              </tr>
+            </thead>
 
-    {{ #(view === 'score') }}
-    <h1>Score sheet</h1>
+            {{ #createTable() }}
+            <tbody>
+              {{ #each rounds: round }}
+              <tr>
+                <th rowspan="3">{{ round + 1 }}</th>
+                <th>Bid</th>
 
-    <table class="table">
-      <thead>
-        <th colspan="2">Round</th>
-        {{ #each playerNames }}
-        <th>{{ this }}</th>
-        {{ /each }}
-      </thead>
+                {{ #each bids: index }}
+                <td><input type="number" value="{{ isNaN(this) ? '' : this }}" on-change="editBid: {{ round }}, {{ index }}" twoway="false" class="browser-default number-input"></td>
+                {{ /each }}
 
-      {{ #createTable() }}
-      <tbody>
-        {{ #each rounds: round }}
-        <tr>
-          <th rowspan="3" class="vertical-middle">{{ round + 1 }}</th>
+                {{ #if(numRounds > 1) }}
+                <td rowspan="3"><button type="button" class="waves-effect waves-light btn red" on-click="removeRound: {{ round }}"><i class="material-icons">remove_circle</i></button></td>
+                {{ /if }}
+              </tr>
 
-          <td>Bid</td>
+              <tr>
+                <th>Tricks</th>
 
-          {{ #each bids: index }}
-          <td><input type="number" value="{{ isNaN(this) ? '' : this }}" on-change="editBid: {{ round }}, {{ index }}" twoway="false" class="number-input"></td>
-          {{ /each }}
+                {{ #each tricks: index }}
+                <td><input type="number" value="{{ isNaN(this) ? '' : this }}" on-change="editTrick: {{ round }}, {{ index }}" twoway="false" class="number-input"></td>
+                {{ /each }}
+              </tr>
 
-          {{ #if(numRounds > 1) }}
-          <td rowspan="3" class="vertical-middle text-center"><button type="button" class="btn btn-danger" on-click="removeRound: {{ round }}"><span class="glyphicon glyphicon-remove"></span>
-</button></td>
-          {{ /if }}
-        </tr>
+              <tr>
+                <th>Score</th>
 
-        <tr>
-          <td>Tricks</td>
+                {{ #each scores: index }}
+                <td>
+                  {{ #!isNaN(this) }}
+                  <span class="{{ (this > 0) ? 'green-text text-darken-1' : 'red-text text-darken-1'}}"><strong>{{ (this > 0) ? '+' + this : this }}</strong></span>
+                  {{ /!isNaN }}
+                </td>
+                {{ /each }}
+              </tr>
+              {{ /each }}
 
-          {{ #each tricks: index }}
-          <td><input type="number" value="{{ isNaN(this) ? '' : this }}" on-change="editTrick: {{ round }}, {{ index }}" twoway="false" class="number-input"></td>
-          {{ /each }}
-        </tr>
+              <tr>
+                <th colspan="2">Total</th>
 
-        <tr>
-          <td>Score</td>
-
-          {{ #each scores: index }}
-          <td>{{ isNaN(this) ? '' : this }}</td>
-          {{ /each }}
-        </tr>
-        {{ /each }}
-
-        <tr>
-          <th colspan="2">Total</th>
-
-          {{ #each totals }}
-          <td>{{ this }}</td>
-          {{ /each }}
-        </tr>
-      </tbody>
-      {{ /createTable }}
-
-    </table>
-    <div class="form-group">
-      <button type="button" class="btn btn-success" on-click="addRound"><span class="glyphicon glyphicon-plus"></span></button>
-    </div>
-    {{ /(view === 'score') }}
-
-
-    {{ #(view === 'setup') }}
-    <h1>Setup</h1>
-
-    <h2>Player names</h2>
-
-      {{ #each players: index }}
-      <div class="form-group">
-        <input placeholder="Player name" value="{{ name }}">
-        {{ #if players.length > 1 }}
-        <button type="button" class="btn btn-danger btn-xs" on-click="removePlayer: {{ index }}"><span class="glyphicon glyphicon-remove"></span></button>
-        {{ /if }}
-      </div>
-      {{ /each}}
-      <div class="form-group">
-        <input placeholder="New player name" on-change="addPlayer">
+                {{ #each totals }}
+                <td>{{ this }}</td>
+                {{ /each }}
+              </tr>
+            </tbody>
+            {{ /createTable }}
+          </table>
+        </div>
       </div>
 
+      <div class="row">
+        <div class="col">
+          <div class="input-field">
+            <button type="button" class="waves-effect waves-light btn green" on-click="addRound"><i class="material-icons left">add_circle</i>Add Round</button>
+            <button type="button" class="waves-effect waves-light btn red" on-click="addRound"><i class="material-icons left">delete_forever</i>Remove All Rounds</button>
+          </div>
+        </div>
+      </div>
+      {{ /(view === 'score') }}
 
-    <h2>Rules</h2>
 
-    <div class="form-group">
-      <select value="{{ rules }}">
-        {{ #each ruleSets: id }}
-        <option value="{{ id }}">{{ name }}</option>
-        {{ /each }}
-      </select>
+      {{ #(view === 'setup') }}
+      <div class="row">
+        <div class="col">
+          <h4>Player names</h4>
+
+          {{ #each players: index }}
+          <div class="input-field">
+            <input type="text" placeholder="Player name" value="{{ name }}">
+
+            {{ #if players.length > 1 }}
+            <button type="button" class="waves-effect waves-light btn red" on-click="removePlayer: {{ index }}"><i class="material-icons">remove_circle</i></button>
+            {{ /if }}
+          </div>
+          {{ /each}}
+
+          <div class="input-field">
+            <input id="new-player-name" type="text" on-change="addPlayer">
+            <label for="new-player-name">New player name</label>
+          </div>
+
+
+          <h4>Rules</h4>
+
+          <div class="input-field">
+            <select class="browser-default" value="{{ rules }}">
+              {{ #each ruleSets: id }}
+              <option value="{{ id }}">{{ name }}</option>
+              {{ /each }}
+            </select>
+          </div>
+
+          <ul class="browser-default">
+            {{ #each ruleSets[rules].details }}
+            <li>{{ this }}</li>
+            {{ /each }}
+          </ul>
+        </div>
+      </div>
+      {{ /(view === 'setup') }}
     </div>
-
-    <ul>
-      {{ #each ruleSets[rules].details }}
-      <li>{{ this }}</li>
-      {{ /each }}
-    </ul>
-    {{ /(view === 'setup') }}
-
   </script>
 
   <script src="//cdnjs.cloudflare.com/ajax/libs/ractive/0.7.3/ractive.min.js"></script>
