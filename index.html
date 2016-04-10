@@ -183,7 +183,7 @@
 
           {{ #each players: index }}
           <div class="input-field">
-            <input type="text" placeholder="Player name" value="{{ name }}">
+            <input type="text" placeholder="Player name" value="{{ name }}" on-input="editPlayerName: {{ index }}" twoway="false">
 
             {{ #if players.length > 1 }}
             <button type="button" class="waves-effect waves-light btn red" on-click="removePlayer: {{ index }}"><i class="material-icons">remove_circle</i></button>
@@ -420,6 +420,10 @@
 
       removePlayer: function(event, index) {
         this.splice('players', index, 1);
+      },
+
+      editPlayerName: function(event, index) {
+        this.set('players[' + index + '].name', event.node.value.trim());
       },
 
       editBid: function(event, round, index) {
