@@ -119,7 +119,7 @@
                 <th>Bids</th>
 
                 {{ #each bids: index }}
-                <td><input type="number" value="{{ this === null ? '' : this }}" on-change="editBid: {{ round }}, {{ index }}" twoway="false" class="browser-default number-input"></td>
+                <td><input type="number" value="{{ this === null ? '' : this }}" on-input="editBid: {{ round }}, {{ index }}" twoway="false" class="browser-default number-input"></td>
                 {{ /each }}
 
                 <td>{{ totalBids }}</td>
@@ -133,7 +133,7 @@
                 <th>Tricks</th>
 
                 {{ #each tricks: index }}
-                <td><input type="number" value="{{ this === null ? '' : this }}" on-change="editTrick: {{ round }}, {{ index }}" twoway="false" class="number-input"></td>
+                <td><input type="number" value="{{ this === null ? '' : this }}" on-input="editTrick: {{ round }}, {{ index }}" twoway="false" class="number-input"></td>
                 {{ /each }}
 
                 <td>{{ totalTricks }}</td>
