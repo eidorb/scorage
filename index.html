@@ -116,7 +116,7 @@
                 <th>Bid</th>
 
                 {{ #each bids: index }}
-                <td><input type="number" value="{{ isNaN(this) ? '' : this }}" on-change="editBid: {{ round }}, {{ index }}" twoway="false" class="browser-default number-input"></td>
+                <td><input type="number" value="{{ this === null ? '' : this }}" on-change="editBid: {{ round }}, {{ index }}" twoway="false" class="browser-default number-input"></td>
                 {{ /each }}
 
                 {{ #if(round && (round == numRounds - 1)) }}
@@ -128,7 +128,7 @@
                 <th>Tricks</th>
 
                 {{ #each tricks: index }}
-                <td><input type="number" value="{{ isNaN(this) ? '' : this }}" on-change="editTrick: {{ round }}, {{ index }}" twoway="false" class="number-input"></td>
+                <td><input type="number" value="{{ this === null ? '' : this }}" on-change="editTrick: {{ round }}, {{ index }}" twoway="false" class="number-input"></td>
                 {{ /each }}
               </tr>
 
@@ -137,9 +137,9 @@
 
                 {{ #each scores: index }}
                 <td>
-                  {{ #!isNaN(this) }}
+                  {{ # !(this === null) }}
                   <span class="{{ (this > 0) ? 'green-text text-darken-1' : 'red-text text-darken-1'}}"><strong>{{ (this > 0) ? '+' + this : this }}</strong></span>
-                  {{ /!isNaN }}
+                  {{ / }}
                 </td>
                 {{ /each }}
               </tr>
@@ -228,8 +228,8 @@
       console.log('No players in storage, using defaults.');
       players = [{
         name: 'Player 1',
-        bids: [NaN],
-        tricks: [NaN]
+        bids: [null],
+        tricks: [null]
       }];
     }
     if (!rules) {
@@ -262,9 +262,9 @@
               '+5 points for taking zero tricks (for bids of zero)',
             ],
             scoreFunc: function(round, bid, tricks) {
-              // Return NaN if either bid or tricks is NaN.
-              if (isNaN(bid) || isNaN(tricks)) {
-                return NaN;
+              // Avoid implicit conversion of null to 0.
+              if (bid === null || tricks === null) {
+                return null;
               }
               if (bid === tricks) {
                 if (bid > 0) {
@@ -285,9 +285,9 @@
               '-5 points for missing your bid',
             ],
             scoreFunc: function(round, bid, tricks) {
-              // Return NaN if either bid or tricks is NaN.
-              if (isNaN(bid) || isNaN(tricks)) {
-                return NaN;
+              // Avoid implicit conversion of null to 0.
+              if (bid === null || tricks === null) {
+                return null;
               }
               if (bid === tricks) {
                 return tricks + 10;
@@ -305,9 +305,9 @@
               '-5 points for missing your bid',
             ],
             scoreFunc: function(round, bid, tricks) {
-              // Return NaN if either bid or tricks is NaN.
-              if (isNaN(bid) || isNaN(tricks)) {
-                return NaN;
+              // Avoid implicit conversion of null to 0.
+              if (bid === null || tricks === null) {
+                return null;
               }
               if (bid === tricks) {
                 if (bid > 0) {
@@ -354,10 +354,9 @@
               bids.push(bid);
               tricks.push(trick);
               scores.push(score);
-              // Add score to the player's total.
-              if (!isNaN(score)) {
-                table.totals[index] += score;
-              }
+              // Add score to the player's total (a null score will be converted
+              // to 0 - not a drama).
+              table.totals[index] += score;
             }
             table.rounds.push({
               bids: bids,
@@ -389,12 +388,12 @@
 
     ractive.on({
       addPlayer: function(event) {
-        // The new player's bids and tricks arrays are filled with as many NaNs
+        // The new player's bids and tricks arrays are filled with as many nulls
         // as there are rounds.
         var numRounds = this.get('numRounds');
         var bids = [];
         for (var i = 0; i < numRounds; i++) {
-          bids.push(NaN);
+          bids.push(null);
         }
         // Tricks is a copy of bids.
         var tricks = bids.slice();
@@ -422,10 +421,10 @@
       },
 
       addRound: function(event) {
-        // Adding a round pushes a NaN on to all players' bids and tricks arrays.
+        // Adding a round pushes a null on to all players' bids and tricks arrays.
         for (var index = 0; index < this.get('players').length; index++) {
-          this.push('players[' + index + '].bids', NaN);
-          this.push('players[' + index + '].tricks', NaN);
+          this.push('players[' + index + '].bids', null);
+          this.push('players[' + index + '].tricks', null);
         }
       },
 
@@ -437,9 +436,10 @@
       },
 
       removeAllRounds: function(event) {
+        // Set all player's bids and tricks arrays to an array with a single null.
         for (var index = 0; index < this.get('players').length; index++) {
-          this.set('players[' + index + '].bids', [NaN]);
-          this.set('players[' + index + '].tricks', [NaN]);
+          this.set('players[' + index + '].bids', [null]);
+          this.set('players[' + index + '].tricks', [null]);
         }
       }
     });
