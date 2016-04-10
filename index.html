@@ -423,12 +423,12 @@
       },
 
       editBid: function(event, round, index) {
-        var parsed = parseInt(event.node.value.trim(), 10);
+        var parsed = parseString(event.node.value.trim());
         this.set('players[' + index + '].bids[' + round + ']', parsed);
       },
 
       editTrick: function(event, round, index) {
-        var parsed = parseInt(event.node.value.trim(), 10);
+        var parsed = parseString(event.node.value.trim());
         this.set('players[' + index + '].tricks[' + round + ']', parsed);
       },
 
@@ -507,6 +507,12 @@
         // If no unique prefix was found, just return the string.
         return string;
       });
+    }
+
+    // Return a parsed base-10 integer or null if parse result was NaN.
+    function parseString(string) {
+      var parsed = parseInt(string, 10);
+      return isNaN(parsed) ? null : parsed;
     }
   </script>
 </body>
