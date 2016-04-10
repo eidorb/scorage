@@ -220,31 +220,25 @@
   <script>
     Ractive.DEBUG = false;
 
-    // Return a list of player objects. Player names are retrieved from storage
-    // or a default player name is used.
-    function retrievePlayers() {
-      var names = store.get('names');
-      if (!names) {
-        console.log('No names in storage, using default player name.');
-        names = ['Player 1'];
-      }
-      // Bids and tricks arrays are set to contain a single NaN.
-      return names.map(function(name) {
-        return {
-          name: name,
-          bids: [NaN],
-          tricks: [NaN]
-        };
-      });
+    // Retrieve data from local storage if present.
+    var players = store.get('players');
+    var rules = store.get('rules');
+    var view = store.get('view');
+    if (!players) {
+      console.log('No players in storage, using defaults.');
+      players = [{
+        name: 'Player 1',
+        bids: [NaN],
+        tricks: [NaN]
+      }];
     }
-
-    function retrieveRules() {
-      var rules = store.get('rules');
-      if (!rules) {
-        console.log('No rules in storage, using default rules.');
-        rules = 'shing';
-      }
-      return rules;
+    if (!rules) {
+      console.log('No rules in storage, using default rules.');
+      rules = 'shing';
+    }
+    if (!view) {
+      console.log('No view in storage, using default view.');
+      view = 'setup';
     }
 
     var ractive = new Ractive({
@@ -253,11 +247,11 @@
       template: '#template',
 
       data: {
-        view: 'setup',
+        view: view,
 
-        players: retrievePlayers(),
+        players: players,
 
-        rules: retrieveRules(),
+        rules: rules,
 
         ruleSets: {
           regular: {
@@ -450,15 +444,19 @@
       }
     });
 
-    // If storage is enabled, observe settings for change and write to storage.
+    // If storage is enabled, observe for change and write to storage.
     if (store.enabled) {
       ractive.observe({
-        playerNames: function() {
-          store.set('names', this.get('playerNames'));
+        players: function() {
+          store.set('players', this.get('players'));
         },
 
         rules: function() {
           store.set('rules', this.get('rules'));
+        },
+
+        view: function() {
+          store.set('view', this.get('view'));
         }
       }, {
         // Don't call the functions initially.
