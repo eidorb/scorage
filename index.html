@@ -113,7 +113,7 @@
               {{ #each rounds: round }}
               <tr>
                 <th rowspan="3">{{ round + 1 }}</th>
-                <th>Bid</th>
+                <th>Bids</th>
 
                 {{ #each bids: index }}
                 <td><input type="number" value="{{ this === null ? '' : this }}" on-change="editBid: {{ round }}, {{ index }}" twoway="false" class="browser-default number-input"></td>
@@ -133,9 +133,9 @@
               </tr>
 
               <tr>
-                <th>Score</th>
+                <th>Points</th>
 
-                {{ #each scores: index }}
+                {{ #each points: index }}
                 <td>
                   {{ # !(this === null) }}
                   <span class="{{ (this > 0) ? 'green-text text-darken-1' : 'red-text text-darken-1'}}"><strong>{{ (this > 0) ? '+' + this : this }}</strong></span>
@@ -146,9 +146,9 @@
               {{ /each }}
 
               <tr>
-                <th colspan="2">Total</th>
+                <th colspan="2">Scores</th>
 
-                {{ #each totals }}
+                {{ #each scores }}
                 <td>{{ this }}</td>
                 {{ /each }}
               </tr>
@@ -334,34 +334,33 @@
         createTable: function() {
           var players = this.get('players');
           var numRounds = this.get('numRounds');
-          var calcScore = this.get('ruleSets')[this.get('rules')].scoreFunc;
+          var calcPoints = this.get('ruleSets')[this.get('rules')].scoreFunc;
           var table = {};
           table.rounds = [];
-          table.totals = [];
+          table.scores = [];
           // The total score for each player is initially set to zero.
-          table.totals = players.map(function() {return 0});
-          // Create player-wise bids, tricks and scores for each round.
+          table.scores = players.map(function() {return 0});
+          // Create player-wise bids, tricks and points for each round.
           for (var round = 0; round < numRounds; round++) {
             var bids = [];
             var tricks = [];
-            var scores = [];
-            // Retrieve each player's bid and tricks for the round, compute
-            // each player's score.
+            var pointsArray = [];
+            // Retrieve each player's bid and tricks for the round and calculate points.
             for (var index = 0; index < players.length; index++) {
               var bid = players[index].bids[round];
               var trick = players[index].tricks[round];
-              var score = calcScore(round, bid, trick);
+              var points = calcPoints(round, bid, trick);
               bids.push(bid);
               tricks.push(trick);
-              scores.push(score);
-              // Add score to the player's total (a null score will be converted
+              pointsArray.push(points);
+              // Add points to the player's score (null points will be converted
               // to 0 - not a drama).
-              table.totals[index] += score;
+              table.scores[index] += points;
             }
             table.rounds.push({
               bids: bids,
               tricks: tricks,
-              scores: scores,
+              points: pointsArray,
             });
           }
           return table;
