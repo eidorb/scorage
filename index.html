@@ -102,9 +102,12 @@
             <thead>
               <tr>
                 <th colspan="2">Round</th>
+
                 {{ #each shortenedNames }}
                 <th><div class="chip">{{ this }}</div></th>
                 {{ /each }}
+
+                <th>&Sigma;</th>
               </tr>
             </thead>
 
@@ -119,6 +122,8 @@
                 <td><input type="number" value="{{ this === null ? '' : this }}" on-change="editBid: {{ round }}, {{ index }}" twoway="false" class="browser-default number-input"></td>
                 {{ /each }}
 
+                <td>{{ totalBids }}</td>
+
                 {{ #if(round && (round == numRounds - 1)) }}
                 <td rowspan="3"><button type="button" class="waves-effect waves-light btn red" on-click="removeRound: {{ round }}"><i class="material-icons left">remove_circle</i>Remove Round</button></td>
                 {{ /if }}
@@ -130,6 +135,8 @@
                 {{ #each tricks: index }}
                 <td><input type="number" value="{{ this === null ? '' : this }}" on-change="editTrick: {{ round }}, {{ index }}" twoway="false" class="number-input"></td>
                 {{ /each }}
+
+                <td>{{ totalTricks }}</td>
               </tr>
 
               <tr>
@@ -345,6 +352,8 @@
             var bids = [];
             var tricks = [];
             var pointsArray = [];
+            var totalBids = 0;
+            var totalTricks = 0;
             // Retrieve each player's bid and tricks for the round and calculate points.
             for (var index = 0; index < players.length; index++) {
               var bid = players[index].bids[round];
@@ -356,11 +365,15 @@
               // Add points to the player's score (null points will be converted
               // to 0 - not a drama).
               table.scores[index] += points;
+              totalBids += bid;
+              totalTricks += trick;
             }
             table.rounds.push({
               bids: bids,
               tricks: tricks,
               points: pointsArray,
+              totalBids: totalBids,
+              totalTricks: totalTricks,
             });
           }
           return table;
