@@ -150,7 +150,7 @@
                 {{ #each points: index }}
                 <td>
                   {{ # !(this === null) }}
-                  <span class="{{ (this > 0) ? 'green-text text-darken-1' : 'red-text text-darken-1'}}"><strong>{{ (this > 0) ? '+' + this : this }}</strong></span>
+                  <span class="{{ (this > 0) ? 'green-text text-darken-1' : (this < 0) ? 'red-text text-darken-1' : ''}}"><strong>{{ (this > 0) ? '+' + this : this }}</strong></span>
                   {{ / }}
                 </td>
                 {{ /each }}
