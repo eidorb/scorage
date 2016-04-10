@@ -71,8 +71,13 @@
     }
 
     /* Space buttons a bit. */
-    .input-field button:not(:first-child) {
+    .input-field a:not(:first-child) {
       margin-left: 1rem;
+    }
+
+    a.btn {
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
   </style>
 </head>
@@ -97,7 +102,7 @@
     <div class="container">
       {{ #(view === 'score') }}
       <div class="row">
-        <div class="col">
+        <div class="col s12">
           <table class="centered">
             <thead>
               <tr>
@@ -125,7 +130,7 @@
                 <td>{{ totalBids }}</td>
 
                 {{ #if(round && (round == numRounds - 1)) }}
-                <td rowspan="3"><button type="button" class="waves-effect waves-light btn red" on-click="removeRound: {{ round }}"><i class="material-icons left">remove_circle</i>Remove Round</button></td>
+                <td rowspan="3"><a class="waves-effect waves-light btn red" on-click="removeRound: {{ round }}"><i class="material-icons left">remove_circle</i>Remove Round</a></td>
                 {{ /if }}
               </tr>
 
@@ -166,10 +171,10 @@
       </div>
 
       <div class="row">
-        <div class="col">
+        <div class="col s12">
           <div class="input-field">
-            <button type="button" class="waves-effect waves-light btn green" on-click="addRound"><i class="material-icons left">add_circle</i>Add Round</button>
-            <button type="button" class="waves-effect waves-light btn red" on-click="removeAllRounds"><i class="material-icons left">delete_forever</i>Remove All Rounds</button>
+            <a class="waves-effect waves-light btn green" on-click="addRound"><i class="material-icons left">add_circle</i>Add Round</a>
+            <a class="waves-effect waves-light btn red" on-click="removeAllRounds"><i class="material-icons left">delete_forever</i>Remove All Rounds</a>
           </div>
         </div>
       </div>
@@ -186,7 +191,7 @@
             <input type="text" placeholder="Player name" value="{{ name }}" on-input="editPlayerName: {{ index }}" twoway="false">
 
             {{ #if players.length > 1 }}
-            <button type="button" class="waves-effect waves-light btn red" on-click="removePlayer: {{ index }}"><i class="material-icons">remove_circle</i></button>
+            <a class="waves-effect waves-light btn red" on-click="removePlayer: {{ index }}"><i class="material-icons">remove_circle</i></a>
             {{ /if }}
           </div>
           {{ /each}}
