@@ -1,0 +1,73 @@
+html {
+  font-family: sans-serif;
+}
+
+/* Adjust z-index so that nav shadows are shown on tabs. */
+nav {
+  position: relative;
+  z-index: 1;
+}
+
+.row {
+  overflow: auto;
+}
+
+table {
+  width: initial;
+}
+
+/* Bottom border after each round. */
+table > tbody > tr:nth-child(3n+0) {
+  border-bottom: 1px solid #d0d0d0;
+}
+
+/* Center row headers too. */
+table.centered tbody tr th {
+  text-align: center;
+}
+
+table tbody th[rowspan] {
+  padding-right: 1em;
+}
+
+table input[type=number] {
+  text-align: center;
+  width: 2rem;
+  height: 1.5rem;
+  margin: 0;
+}
+
+table th .chip {
+  text-transform: uppercase;
+  font-weight: inherit;
+}
+
+td, th {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+input[type=text] {
+  width: 10rem;
+}
+
+/* Remove Webkit spinners. */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+select.browser-default {
+  width: inherit;
+}
+
+/* Space buttons a bit. */
+.input-field a:not(:first-child) {
+  margin-left: 1rem;
+}
+
+a.btn {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
