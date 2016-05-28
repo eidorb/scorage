@@ -19,83 +19,89 @@
   <div id="ractive-container"></div>
 
   <script id="template" type="text/ractive">
-
     <ul class="tabs">
       <li class="tab"><a href="javascript:;" class="{{ (view === 'score') ? 'active' : '' }}" on-click="set('view', 'score')">Scores</a></li>
       <li class="tab"><a href="javascript:;" class="{{ (view === 'setup') ? 'active' : '' }}" on-click="set('view', 'setup')">Setup</a></li>
     </ul>
 
     <div class="container">
-      {{ #(view === 'score') }}
+    {{ #(view === 'score') }}
       <div class="row">
         <div class="col s12">
           <table class="centered">
             <thead>
               <tr>
-                <th colspan="2">Round</th>
-
-                {{ #each shortenedNames }}
-                <th><div class="chip">{{ this }}</div></th>
-                {{ /each }}
-
+                <th>Hands</th>
+                <th></th>
+              <!-- Render each player's short as table headings name. -->
+              {{ #players }}
+                <th><div class="chip">{{ shortName }}</div></th>
+              {{ /players }}
                 <th>&Sigma;</th>
               </tr>
             </thead>
 
-            {{ #createTable() }}
             <tbody>
-              {{ #each rounds: round }}
+            <!-- Each round has 3 rows of data: bids, tricks and points. -->
+            {{ #rounds: index }}
               <tr>
-                <th rowspan="3">{{ round + 1 }}</th>
+                <!-- Hands cell spans 3 rows (bids, tricks and points). -->
+                <th rowspan="3">{{ hands }}</th>
                 <th>Bids</th>
 
-                {{ #each bids: index }}
-                <td><input type="number" value="{{ this === null ? '' : this }}" on-input="editBid: {{ round }}, {{ index }}" twoway="false" class="browser-default number-input"></td>
-                {{ /each }}
+              <!-- Render players' bids and sum of bids. -->
+              {{ #players }}
+                <td><input type="number" value="{{ bids[id] }}" on-input="editBid: {{ index }}, {{ id }}" twoway="false" class="browser-default number-input"></td>
+              {{ /players }}
+                <td>{{ sumRound(index, 'bids') }}</td>
 
-                <td>{{ totalBids }}</td>
-
-                {{ #if(round && (round == numRounds - 1)) }}
-                <td rowspan="3"><a class="waves-effect waves-light btn red" on-click="removeRound: {{ round }}"><i class="material-icons left">remove_circle</i>Remove Round</a></td>
-                {{ /if }}
+              <!-- Add a remove round button if there is more than one round
+                   and this round is the last round. -->
+              {{ #if(index && (index === rounds.length - 1)) }}
+                <td rowspan="3"><a class="waves-effect waves-light btn red" on-click="removeRound: {{ index }}"><i class="material-icons left">remove_circle</i>Remove Round</a></td>
+              {{ /if }}
               </tr>
 
               <tr>
                 <th>Tricks</th>
 
-                {{ #each tricks: index }}
-                <td><input type="number" value="{{ this === null ? '' : this }}" on-input="editTrick: {{ round }}, {{ index }}" twoway="false" class="number-input"></td>
-                {{ /each }}
-
-                <td>{{ totalTricks }}</td>
+              <!-- Render players' tricks and sum of tricks. -->
+              {{ #players }}
+                <td><input type="number" value="{{ tricks[id] }}" on-input="editTrick: {{ index }}, {{ id }}" twoway="false" class="number-input"></td>
+              {{ /players }}
+                <td>{{ sumRound(index, 'tricks') }}</td>
               </tr>
 
               <tr>
                 <th>Points</th>
 
-                {{ #each points: index }}
+              {{ #players }}
+              <!-- Calculate this player's points. -->
+              {{ # {points: calculatePoints(bids[id], tricks[id], hands)} }}
                 <td>
-                  {{ # !(this === null) }}
-                  <span class="{{ (this > 0) ? 'green-text text-darken-1' : (this < 0) ? 'red-text text-darken-1' : ''}}"><strong>{{ (this > 0) ? '+' + this : this }}</strong></span>
-                  {{ / }}
+                  <!-- Style green if positive, red if negative. Prepend a '+' if positive. -->
+                  <span class="{{ (points > 0) ? 'green-text text-darken-1' : (points < 0) ? 'red-text text-darken-1' : ''}}">{{ (points > 0) ? '+' + points : points }}</span>
                 </td>
-                {{ /each }}
+              {{ /points }}
+              {{ /players }}
               </tr>
-              {{ /each }}
+            {{ /rounds }}
 
               <tr>
-                <th colspan="2">Scores</th>
-
-                {{ #each scores }}
-                <td>{{ this }}</td>
-                {{ /each }}
+                <th></th>
+                <th>Scores</th>
+              <!-- Sum each player's points. -->
+              {{ #players }}
+                <td>{{ scores[id] }}</td>
+              {{ /players }}
               </tr>
             </tbody>
-            {{ /createTable }}
+
           </table>
         </div>
       </div>
 
+      <!-- Controls to add and remove rounds. -->
       <div class="row">
         <div class="col s12">
           <div class="input-field">
@@ -104,24 +110,26 @@
           </div>
         </div>
       </div>
-      {{ /(view === 'score') }}
+    {{ /(view === 'score') }}
 
 
-      {{ #(view === 'setup') }}
+    {{ #(view === 'setup') }}
       <div class="row">
         <div class="col s12 m6">
           <h4>Player names</h4>
 
-          {{ #each players: index }}
+        {{ #players }}
           <div class="input-field">
-            <input type="text" placeholder="Player name" value="{{ name }}" on-input="editPlayerName: {{ index }}" twoway="false">
+            <input type="text" placeholder="Player name" value="{{ name }}" on-input="editPlayerName: {{ id }}" twoway="false">
 
-            {{ #if players.length > 1 }}
-            <a class="waves-effect waves-light btn red" on-click="removePlayer: {{ index }}"><i class="material-icons">remove_circle</i></a>
-            {{ /if }}
+          <!-- Show a remove button if there is more than one player. -->
+          {{ #if(players.length) }}
+            <a class="waves-effect waves-light btn red" on-click="removePlayer: {{ id }}"><i class="material-icons">remove_circle</i></a>
+          {{ /if }}
           </div>
-          {{ /each}}
+        {{ /players}}
 
+          <!-- Input for creating a new player. -->
           <div class="input-field">
             <input id="new-player-name" type="text" on-change="addPlayer">
             <label for="new-player-name">New player name</label>
@@ -133,20 +141,21 @@
 
           <div class="input-field">
             <select class="browser-default" value="{{ rules }}">
-              {{ #each ruleSets: id }}
-              <option value="{{ id }}">{{ name }}</option>
-              {{ /each }}
+            <!-- Populate options with rule key: rule name. -->
+            {{ #rulesSet: key }}
+              <option value="{{ key }}">{{ name }}</option>
+            {{ /rulesSet }}
             </select>
           </div>
 
           <ul class="browser-default">
-            {{ #each ruleSets[rules].details }}
+          {{ #rulesSet[rules].details }}
             <li>{{ this }}</li>
-            {{ /each }}
+          {{ /details }}
           </ul>
         </div>
       </div>
-      {{ /(view === 'setup') }}
+    {{ /(view === 'setup') }}
     </div>
   </script>
 
