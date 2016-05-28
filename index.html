@@ -54,12 +54,6 @@
                 <td><input type="number" value="{{ bids[id] }}" on-input="editBid: {{ index }}, {{ id }}" twoway="false" class="browser-default number-input"></td>
               {{ /players }}
                 <td>{{ sumRound(index, 'bids') }}</td>
-
-              <!-- Add a remove round button if there is more than one round
-                   and this round is the last round. -->
-              {{ #if(index && (index === rounds.length - 1)) }}
-                <td rowspan="3"><a class="waves-effect waves-light btn red" on-click="removeRound: {{ index }}"><i class="material-icons left">remove_circle</i>Remove Round</a></td>
-              {{ /if }}
               </tr>
 
               <tr>
@@ -84,6 +78,9 @@
                 </td>
               {{ /points }}
               {{ /players }}
+
+                <!-- Extra blank cell because points aren't summed, unlike bids and tricks. -->
+                <td></td>
               </tr>
             {{ /rounds }}
 
@@ -104,8 +101,18 @@
       <!-- Controls to add and remove rounds. -->
       <div class="row">
         <div class="col s12">
-          <div class="input-field">
+          <div class="inline-button">
             <a class="waves-effect waves-light btn green" on-click="addRound"><i class="material-icons left">add_circle</i>Add Round</a>
+          </div>
+
+          <div class="inline-button">
+            <!-- Add a remove last round button if there is more than one round. -->
+            {{ #if(rounds.length > 1) }}
+              <a class="waves-effect waves-light btn red" on-click="removeRound: {{ rounds.length - 1 }}"><i class="material-icons left">remove_circle</i>Remove Last Round</a>
+            {{ /if }}
+          </div>
+
+          <div class="inline-button">
             <a class="waves-effect waves-light btn red" on-click="removeAllRounds"><i class="material-icons left">delete_forever</i>Remove All Rounds</a>
           </div>
         </div>

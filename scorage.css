@@ -58,16 +58,13 @@ input[type=number]::-webkit-outer-spin-button {
   margin: 0;
 }
 
+/* 100% width select box looks silly. */
 select.browser-default {
   width: inherit;
 }
 
-/* Space buttons a bit. */
-.input-field a:not(:first-child) {
-  margin-left: 1rem;
-}
-
-a.btn {
-  white-space: nowrap;
-  text-overflow: ellipsis;
+.inline-button {
+  display: inline-block;
+  margin-top: 1rem;
+  margin-right: 0.66rem;
 }
