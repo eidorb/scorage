@@ -46,12 +46,12 @@
             {{ #rounds: index }}
               <tr>
                 <!-- Hands cell spans 3 rows (bids, tricks and points). -->
-                <th rowspan="3">{{ hands }}</th>
+                <th rowspan="3"><input type="number" value="{{ hands }}" autocomplete="off" min="1" tabindex="-1"></th>
                 <th>Bids</th>
 
               <!-- Render players' bids and sum of bids. -->
               {{ #players }}
-                <td><input type="number" value="{{ bids[id] }}" on-input="editBid: {{ index }}, {{ id }}" twoway="false" class="browser-default number-input"></td>
+                <td><input type="number" value="{{ bids[id] }}" on-input="editBid: {{ index }}, {{ id }}" twoway="false" class="no-spinner" autocomplete="off" min="0"></td>
               {{ /players }}
                 <td>{{ sumRound(index, 'bids') }}</td>
               </tr>
@@ -61,7 +61,7 @@
 
               <!-- Render players' tricks and sum of tricks. -->
               {{ #players }}
-                <td><input type="number" value="{{ tricks[id] }}" on-input="editTrick: {{ index }}, {{ id }}" twoway="false" class="number-input"></td>
+                <td><input type="number" value="{{ tricks[id] }}" on-input="editTrick: {{ index }}, {{ id }}" twoway="false" class="no-spinner" autocomplete="off" min="0"></td>
               {{ /players }}
                 <td>{{ sumRound(index, 'tricks') }}</td>
               </tr>
@@ -71,7 +71,7 @@
 
               {{ #players }}
               <!-- Calculate this player's points. -->
-              {{ # {points: calculatePoints(bids[id], tricks[id], hands)} }}
+              {{ # {points: calculatePoints(rounds[index], id)} }}
                 <td>
                   <!-- Style green if positive, red if negative. Prepend a '+' if positive. -->
                   <span class="{{ (points > 0) ? 'green-text text-darken-1' : (points < 0) ? 'red-text text-darken-1' : ''}}">{{ (points > 0) ? '+' + points : points }}</span>
