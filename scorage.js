@@ -154,6 +154,23 @@ var ractive = new Ractive({
       });
       return sum;
     },
+
+    /**
+     * Calculate player's points for a round if bid and tricks don't equate to null.
+     * A player's bid and tricks undefined initially and also when an input is
+     * is cleared or invalid.
+     * round - Round object
+     * id - player's id
+     */
+    calculatePoints: function(round, id) {
+      var calculatePoints = this.get('rulesSet')[this.get('rules')].calculatePoints;
+        bid = round.bids[id],
+        tricks = round.tricks[id];
+
+      if (bid != null && tricks != null) {
+        return calculatePoints(bid, tricks, round.hands);
+      }
+    },
     rulesSet: {
       regular: {
         name: 'Regular',
@@ -244,27 +261,11 @@ var ractive = new Ractive({
     },
 
     /**
-     * Calculate points if bid and tricks don't equate to null.
-     * bid - Player's bid
-     * tricks - Player's tricks
-     * hands - Number of hands this round
-     */
-    calculatePoints: function() {
-      var calculatePoints = this.get('rulesSet')[this.get('rules')].calculatePoints,
-        calculatePointsWrapper = function(bid, tricks, hands) {
-          if (bid != null && tricks != null) {
-            return calculatePoints(bid, tricks, hands);
-          }
-        };
-
-      return calculatePointsWrapper;
-    },
-
-    /**
      * Return a object of player scores (sum of points).
      */
     scores: function() {
-      var rounds = this.get('rounds'),
+      var ractive = this,
+        rounds = this.get('rounds'),
         playerOrder = this.get('playerOrder'),
         calculatePoints = this.get('calculatePoints'),
         scores = {};
@@ -274,9 +275,8 @@ var ractive = new Ractive({
         var score = null;
 
         // Score is the sum a player's points for each round.
-        rounds.forEach(function(round) {
-          var points = calculatePoints(
-            round['bids'][id], round['tricks'][id], round['hands']);
+        rounds.forEach(function(round, index) {
+          var points = calculatePoints.call(ractive, round, id);
 
           if (points != null) {
             score += points;
