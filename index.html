@@ -128,7 +128,7 @@
 
         {{ #players }}
           <div class="input-field">
-            <input type="text" placeholder="Player name" value="{{ name }}" on-input="editPlayerName: {{ id }}" twoway="false">
+            <input type="text" placeholder="Player name" value="{{ name }}" on-input="editPlayerName: {{ id }}" twoway="false" autocomplete="off">
 
           <!-- Show a remove button if there is more than one player. -->
           {{ #if(players.length  > 1) }}
@@ -139,7 +139,7 @@
 
           <!-- Input for creating a new player. -->
           <div class="input-field">
-            <input id="new-player-name" type="text" on-change="addPlayer">
+            <input id="new-player-name" type="text" on-change="addPlayer" autocomplete="off">
             <label for="new-player-name">New player name</label>
           </div>
         </div>
