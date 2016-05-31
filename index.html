@@ -130,7 +130,7 @@
             <input type="text" placeholder="Player name" value="{{ name }}" on-input="editPlayerName: {{ id }}" twoway="false">
 
           <!-- Show a remove button if there is more than one player. -->
-          {{ #if(players.length) }}
+          {{ #if(players.length  > 1) }}
             <a class="waves-effect waves-light btn red" on-click="removePlayer: {{ id }}"><i class="material-icons">remove_circle</i></a>
           {{ /if }}
           </div>
