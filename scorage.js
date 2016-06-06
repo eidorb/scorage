@@ -216,7 +216,7 @@ var ractive = new Ractive({
         name: "Shing's house rules",
         details: [
           '+1 point for each trick',
-          '+10 points for a successful non-zero bid)',
+          '+10 points for a successful non-zero bid',
           'Greater of the number of hands or 5 points for a successful zero bid',
           '-5 points for an unsuccessful bid',
         ],
