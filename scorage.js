@@ -1,4 +1,4 @@
-var latestDataVersion = 1,
+var latestDataVersion = 2,
   dataVersion = store.get('dataVersion'),
   view = store.get('view'),
   rules = store.get('rules'),
@@ -298,12 +298,12 @@ ractive.on({
    */
   addPlayer: function(event) {
     var name = event.node.value.trim(),
-      // players = this.get('players'),
-      //playerOrder = this.get('playerOrder'),
       id = Math.random().toString().slice(2);
 
+    // Add player name and id.
     this.set('playerMap.' + id, name);
     this.push('playerOrder', id);
+
     // Clear the new player input field.
     event.node.value = '';
   },
@@ -316,7 +316,8 @@ ractive.on({
   removePlayer: function(event, id) {
     var playerMap = this.get('playerMap'),
       playerOrder = this.get('playerOrder'),
-      rounds = this.get('rounds');
+      rounds = this.get('rounds'),
+      ractive = this;
 
     delete playerMap[id];
     playerOrder.splice(playerOrder.indexOf(id), 1);
@@ -324,13 +325,13 @@ ractive.on({
 
     // Remove player properties from each round's bids and tricks.
     rounds.forEach(function(round, index) {
-      var bids = this.get('rounds.' + index + '.bids.' + id),
-        tricks = this.get('rounds.' + index + '.tricks.' + id);
+      var bids = ractive.get('rounds.' + index + '.bids.' + id),
+        tricks = ractive.get('rounds.' + index + '.tricks.' + id);
 
       delete bids[id];
       delete tricks[id];
-      this.set('rounds.' + index + '.bids.' + id, bids);
-      this.set('rounds.' + index + '.tricks.' + id, tricks);
+      ractive.set('rounds.' + index + '.bids.' + id, bids);
+      ractive.set('rounds.' + index + '.tricks.' + id, tricks);
     });
   },
 
